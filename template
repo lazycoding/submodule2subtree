@@ -1,0 +1,4 @@
+git submodule deinit -f path/to/foo
+git rm -f path/to/foo
+rm -rf .git/modules/path/to/foo
+git commit -m "chore: remove submodule foo"

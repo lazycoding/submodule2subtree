@@ -1,0 +1,39 @@
+[submodule "flutter_desktop"]
+	path = mgit/flutter_desktop
+	url = ssh://git@icode.baidu.com:8235/baidu/so-hermes/flutter_desktop
+[submodule "flutter_module"]
+	path = mgit/flutter_module
+	url = ssh://git@icode.baidu.com:8235/baidu/so-hermes/flutter_mobile
+[submodule "hardware-flutter"]
+	path = mgit/hardware-flutter
+	url = ssh://git@icode.baidu.com:8235/baidu/so-hermes/flutter_hardware
+[submodule "flutter_exception_performance"]
+	path = mgit/flutter_exception_performance
+	url = ssh://git@icode.baidu.com:8235/baidu/flutter-dev/flutter_exception_performance
+[submodule "flutter_imsdk"]
+	path = mgit/flutter_imsdk
+	url = ssh://git@icode.baidu.com:8235/baidu/so-hermes/flutter_imsdk
+[submodule "webview_cef"]
+	path = mgit/webview_cef
+	url = ssh://git@icode.baidu.com:8235/baidu/third-party/webview_cef
+[submodule "flutter_desktop_window_plugins"]
+	path = mgit/flutter_desktop_window_plugins
+	url = ssh://git@icode.baidu.com:8235/baidu/so-hermes/flutter_desktop_window_manager
+[submodule "bespoke-resources-flutter"]
+	path = mgit/bespoke-resources-flutter
+	url = ssh://git@icode.baidu.com:8235/baidu/infoflow-slimes/bespoke-resources-flutter
+[submodule "app-resources"]
+	path = mgit/app-resources
+	url = ssh://git@icode.baidu.com:8235/baidu/so-hermes/app-resources
+[submodule "flutter-quill"]
+	path = mgit/flutter-quill
+	url = ssh://git@icode.baidu.com:8235/baidu/third-party/flutter-quill
+[submodule "birtc-flutter"]
+	path = mgit/birtc-flutter
+	url = ssh://git@icode.baidu.com:8235/baidu/speech-arch/birtc-flutter
+[submodule "flutter_local_notifications"]
+	path = mgit/flutter_local_notifications
+	url = ssh://git@icode.baidu.com:8235/baidu/third-party/flutter_local_notifications
+[submodule "super_drag_and_drop"]
+	path = mgit/super_drag_and_drop
+	url = ssh://git@icode.baidu.com:8235/baidu/third-party/super_drag_and_drop

@@ -1,0 +1,7 @@
+git remote add foo-repo https://xxx/foo.git
+git fetch foo-repo
+
+git subtree add \
+  --prefix=mgit/foo \
+  foo-repo main \
+  --squash=false
