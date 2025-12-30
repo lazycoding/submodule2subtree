@@ -17,6 +17,7 @@ const CONFIG_FILE = 'submodule_branches.json';
 class SubmoduleManager {
     constructor(workDir = process.cwd()) {
         this.workDir = path.resolve(workDir);
+        this.currentDir = path.resolve(); // 保存当前目录
         this.submodules = [];
         this.config = {};
 
@@ -168,14 +169,14 @@ class SubmoduleManager {
             }
         }
 
-        const configPath = path.join(this.workDir, CONFIG_FILE);
+        const configPath = path.join(this.currentDir, CONFIG_FILE);
         fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
         console.log(`子模块信息已保存到 ${configPath}`);
     }
 
     async unbindSubmodules() {
         // 检查this.submodules和CONFIG_FILE是否存在
-        const configPath = path.join(this.workDir, CONFIG_FILE);
+        const configPath = path.join(this.currentDir, CONFIG_FILE);
         if (!fs.existsSync(configPath) && (!this.submodules || this.submodules.length === 0)) {
             console.error('错误: 未找到子模块配置文件和子模块信息');
             console.error('请先运行选项1获取子模块分支信息');
@@ -226,7 +227,7 @@ class SubmoduleManager {
     }
 
     async addAsSubtree() {
-        const configPath = path.join(this.workDir, CONFIG_FILE);
+        const configPath = path.join(this.currentDir, CONFIG_FILE);
         if (!fs.existsSync(configPath)) {
             console.error(`错误: 未找到${configPath}配置文件`);
             console.error('请先运行选项1获取分支信息');
@@ -240,19 +241,61 @@ class SubmoduleManager {
             const repoName = submodulePath.replace(/mgit\//g, '');
 
             try {
+                // 检查工作区是否有未提交的修改
+                try {
+                    const status = execSync('git status --porcelain').toString().trim();
+                    if (status) {
+                        console.log(`\n检测到工作区有未提交的修改：`);
+                        console.log(status);
+                        console.log(`\n请先提交或暂存这些修改，然后再添加子树 ${submodulePath}`);
+                        return;
+                    }
+                } catch (error) {
+                    console.warn(`检查工作区状态失败: ${error.message}`);
+                }
+
                 // 检查子树目录和远程仓库是否都已存在
                 const submoduleFullPath = path.join(this.workDir, submodulePath);
                 const remotes = execSync('git remote').toString().split('\n').filter(Boolean);
                 const hasSubtreeDir = fs.existsSync(submoduleFullPath);
                 const hasRemote = remotes.includes(repoName);
 
-                if (hasSubtreeDir && hasRemote) {
-                    console.log(`[${submodulePath}] 跳过：子树目录和远程仓库都已存在`);
-                    continue;
+                // 如果remote已存在，询问是否删除现有remote和子树目录
+                if (hasRemote) {
+                    console.log(`[${submodulePath}] 检测到已存在的远程仓库: ${repoName}`);
+
+                    const { confirmDelete } = await inquirer.prompt([
+                        {
+                            type: 'confirm',
+                            name: 'confirmDelete',
+                            message: `是否删除现有的远程仓库 ${repoName} 并重新添加?`,
+                            default: true
+                        }
+                    ]);
+
+                    if (confirmDelete) {
+                        try {
+                            // 删除现有的remote
+                            console.log(`[${submodulePath}] 删除远程仓库 ${repoName}...`);
+                            execSync(`git remote remove ${repoName}`);
+
+                            // 如果子树目录存在，也删除它
+                            if (hasSubtreeDir) {
+                                console.log(`[${submodulePath}] 删除现有子树目录...`);
+                                fs.rmSync(submoduleFullPath, { recursive: true, force: true });
+                            }
+
+                            console.log(`[${submodulePath}] 清理完成，准备重新添加`);
+                        } catch (error) {
+                            console.error(`[${submodulePath}] 清理现有配置失败:`, error.message);
+                            continue;
+                        }
+                    } else {
+                        console.log(`[${submodulePath}] 跳过，保留现有配置`);
+                        continue;
+                    }
                 } else if (hasSubtreeDir) {
-                    console.log(`[${submodulePath}] 警告：子树目录已存在但远程仓库 ${repoName} 未配置`);
-                } else if (hasRemote) {
-                    console.log(`[${submodulePath}] 警告：远程仓库 ${repoName} 已存在但子树目录未创建`);
+                    console.log(`[${submodulePath}] 检测到已存在的子树目录，将保留目录结构`);
                 }
 
                 // 询问是否使用 squash 参数
